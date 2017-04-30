@@ -211,16 +211,18 @@ g_vars = [var for var in tvars if 'g_' in var.name]
 
 # Train the discriminator
 # Increasing from 0.001 in GitHub version
-with tf.variable_scope(tf.get_variable_scope(), reuse=False) as scope:
+# with tf.variable_scope(tf.get_variable_scope(), reuse=False) as scope:
+with tf.variable_scope('scope', reuse=False):
     #Next, we specify our two optimizers. In today’s era of deep learning, Adam seems to be the
     #best SGD optimizer as it utilizes adaptive learning rates and momentum.
     #We call Adam's minimize function and also specify the variables that we want it to update.
-    d_trainer_fake = tf.train.AdamOptimizer(0.0001).minimize(d_loss_fake, var_list=d_vars)
-    d_trainer_real = tf.train.AdamOptimizer(0.0001).minimize(d_loss_real, var_list=d_vars)
-
+    # d_trainer_fake = tf.train.AdamOptimizer(0.0001).minimize(d_loss_fake, var_list=d_vars)
+    # d_trainer_real = tf.train.AdamOptimizer(0.0001).minimize(d_loss_real, var_list=d_vars)
+    d_trainer_fake=tf.train.GradientDescentOptimizer(0.01).minimize(d_loss_fake, var_list=d_vars)
+    d_trainer_real=tf.train.GradientDescentOptimizer(0.01).minimize(d_loss_real, var_list=d_vars)
     # Train the generator
     # Decreasing from 0.004 in GitHub version
-    g_trainer = tf.train.AdamOptimizer(0.0001).minimize(g_loss, var_list=g_vars)
+    g_trainer = tf.train.GradientDescentOptimizer(0.01).minimize(g_loss, var_list=g_vars)
 
 #Outputs a Summary protocol buffer containing a single scalar value.
 tf.summary.scalar('Generator_loss', g_loss)
@@ -270,12 +272,14 @@ for i in range(50000):
     real_image_batch = mnist.train.next_batch(batch_size)[0].reshape([batch_size, 28, 28, 1])
     if dLossFake > 0.6:
         # Train discriminator on generated images
+        print('dLossFake > 0.6')
         _, dLossReal, dLossFake, gLoss = sess.run([d_trainer_fake, d_loss_real, d_loss_fake, g_loss],
                                                     {x_placeholder: real_image_batch})
         d_fake_count += 1
 
     if gLoss > 0.5:
         # Train the generator
+        print('gLoss > 0.5')
         _, dLossReal, dLossFake, gLoss = sess.run([g_trainer, d_loss_real, d_loss_fake, g_loss],
                                                     {x_placeholder: real_image_batch})
         g_count += 1
@@ -283,6 +287,7 @@ for i in range(50000):
     if dLossReal > 0.45:
         # If the discriminator classifies real images as fake,
         # train discriminator on real values
+        print('dLossReal > 0.45')
         _, dLossReal, dLossFake, gLoss = sess.run([d_trainer_real, d_loss_real, d_loss_fake, g_loss],
                                                     {x_placeholder: real_image_batch})
         d_real_count += 1
