@@ -218,11 +218,11 @@ with tf.variable_scope('scope', reuse=False):
     #We call Adam's minimize function and also specify the variables that we want it to update.
     # d_trainer_fake = tf.train.AdamOptimizer(0.0001).minimize(d_loss_fake, var_list=d_vars)
     # d_trainer_real = tf.train.AdamOptimizer(0.0001).minimize(d_loss_real, var_list=d_vars)
-    d_trainer_fake=tf.train.GradientDescentOptimizer(0.01).minimize(d_loss_fake, var_list=d_vars)
-    d_trainer_real=tf.train.GradientDescentOptimizer(0.01).minimize(d_loss_real, var_list=d_vars)
+    d_trainer_fake=tf.train.GradientDescentOptimizer(0.004).minimize(d_loss_fake, var_list=d_vars)
+    d_trainer_real=tf.train.GradientDescentOptimizer(0.004).minimize(d_loss_real, var_list=d_vars)
     # Train the generator
     # Decreasing from 0.004 in GitHub version
-    g_trainer = tf.train.GradientDescentOptimizer(0.01).minimize(g_loss, var_list=g_vars)
+    g_trainer = tf.train.GradientDescentOptimizer(0.004).minimize(g_loss, var_list=g_vars)
 
 #Outputs a Summary protocol buffer containing a single scalar value.
 tf.summary.scalar('Generator_loss', g_loss)
